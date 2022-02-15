@@ -5,7 +5,8 @@ will take a list of names and output what should be pruned. You can specify how 
 minute, hour, day, etc.
 
 #### Example usage
-Creates and keeps 8 hourly backups and 7 daily btrfs snapshots.
+Creates and keeps 8 hourly backups and 7 daily btrfs snapshots. Run as often as you like (at least
+hourly in this situation. or not)
 
 	btrfs subvolume snapshot -r /home /mnt/snapshots/$(filetimegen "home-{now}")
 	find /mnt/snapshots -mindepth 1 -maxdepth 1 -name "home-*" -type d -printf "%f\0" \
