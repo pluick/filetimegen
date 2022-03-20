@@ -283,10 +283,8 @@ bool SortTimestruct(timestruct const& lhs, timestruct const& rhs)
 // length of "2020-01-12T13:45:00"
 const size_t NOW_SPEC_LENGTH = 19;
 
-string GenerateFileTime(string Spec, system_clock::time_point tp)
+string GenerateFileTime(string Spec, timestruct now)
 {
-	timestruct now = timestruct(tp);
-
 	char now_str[100];
 	std::snprintf(now_str, 100, "%04d-%02d-%02dT%02d:%02d:%02d",
 			now.year, now.mon, now.mday,
@@ -347,15 +345,9 @@ void FindPruneKeep(vector<timestruct> const& times, vector<size_t> &keep, shared
 	}
 
 	// Merge with keep
-	/*
-	vector<size_t> merged_keep(std::max(keep.size(), add_keep.size()));
-	auto it = std::set_union(keep.begin(), keep.end(), add_keep.begin(), add_keep.end(),
-			merged_keep.begin());
-			*/
 	vector<size_t> merged_keep;
 	auto it = std::set_union(keep.begin(), keep.end(), add_keep.begin(), add_keep.end(),
 			std::inserter(merged_keep, merged_keep.begin()));
-	//merged_keep.erase(it, merged_keep.end());
 	keep.swap(merged_keep);
 }
 
@@ -405,7 +397,7 @@ void PruneFiles(CLArgs const& clargs)
 	for (size_t i = 0; i < input_times.size(); i++) {
 		if (!std::binary_search(keep.begin(), keep.end(), i)) {
 			// Prune it
-			cout << GenerateFileTime(clargs.Spec, input_times[i].tp) << delim;
+			cout << GenerateFileTime(clargs.Spec, input_times[i]) << delim;
 		}
 	}
 }
@@ -425,7 +417,7 @@ int main(int argc, char **argv)
 	if (clargs.Prune)
 		PruneFiles(clargs);
 	else
-		cout << GenerateFileTime(clargs.Spec, system_clock::now());
+		cout << GenerateFileTime(clargs.Spec, timestruct(system_clock::now()));
 
 	return 0;
 }
